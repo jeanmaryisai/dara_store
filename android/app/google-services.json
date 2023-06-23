@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "410212615900",
+    "project_id": "mirvstore-95bc1",
+    "storage_bucket": "mirvstore-95bc1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410212615900:android:cfd5275d584f8b7e82d619",
+        "android_client_info": {
+          "package_name": "com.mirv_store.dara_store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410212615900-cd86lk0m01f46pkaopmp87kjv2047db1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAY0KtoSNUwQp9gRe7ai1f8GonNEax1U3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410212615900-cd86lk0m01f46pkaopmp87kjv2047db1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

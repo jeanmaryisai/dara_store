@@ -1,63 +1,25 @@
-class Message1 {
-  String sender;
-  String avatarUrl;
-  String time;
-  String content;
-  int number;
-  bool online;
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import '../components/data.dart';
+import 'chat.dart';
+import 'trade.dart';
+import 'user.dart';
 
-  Message1({
-    required this.sender, 
-    required this.avatarUrl, 
-    required this.time, 
-    required this.content, 
-    this.number=0,
-    required this.online});
+class Message extends Identifiable {
+  String? message;
+  DateTime send;
+  Trade? trade;
+  User sender;
+  Message({
+    this.message,
+    required this.send,
+    this.trade,
+    required this.sender,
+  });
+
+  bool isTrade(){
+    return trade==null?false:true;
+  }
+  bool isMe(){
+    return sender.id==currentUser.id?true:false;
+  }
 }
-
-final List<Message1> messages = [
-  Message1(
-    sender: 'Vermon Bradley',
-    avatarUrl: 'assets/images/person1.jpg',
-    time: '5:45 PM',
-    content: 'Shall we meet today?',
-    number: 1,
-    online:true,
-  ),
-  Message1(
-    sender: 'Jason Howard',
-    avatarUrl: 'assets/images/person2.jfif',
-    time: '11:12 AM',
-    content: 'Hahahahahah..😂',
-    number: 2,
-    online:true
-  ),
-  Message1(
-    sender: 'Melvin Burgess',
-    avatarUrl: 'assets/images/person3.jfif',
-    time: '10:45 AM',
-    content: 'Sounds perfect to me.😎',
-    online:false
-  ),
-    Message1(
-    sender: 'Duane McDonald',
-    avatarUrl: 'assets/images/person4.jfif',
-    time: '8:06 AM',
-    content: 'The cost is too high, Can you have us come to some form of agreement?',
-    online:true
-  ),
-    Message1(
-    sender: 'Isabella Clayton',
-    avatarUrl: 'assets/images/person5.jpeg',
-    time: 'Yesterday',
-    content: 'I think , i am going fot it. Thanks alot',
-    online:true
-  ),
-    Message1(
-    sender: 'Addies Cain',
-    avatarUrl: 'assets/images/person6.jpg',
-    time: 'Yesterday',
-    content: 'Oooh yeah! YOLO!!? 😍💛',
-    online:false
-  )
-];

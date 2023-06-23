@@ -10,7 +10,6 @@ class Messages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-
     double defaultScreenWidth = 400.0;
     double defaultScreenHeight = 810.0;
 
@@ -26,7 +25,7 @@ class Messages extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
                   icon: Icon(Icons.search, color: Colors.grey, size: 30),
-                  onPressed: () {}),
+                  onPressed: () {}), 
             )
           ],
         ),

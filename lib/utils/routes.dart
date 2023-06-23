@@ -41,29 +41,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case MessagesViewRoute:
       return MaterialPageRoute(builder: (BuildContext context) => Messages());
       break;
-    case MessageViewRoute:
-      return MaterialPageRoute(builder: (BuildContext context) {
-        Message1? message = args as Message1?;
-        if (message == null) {
-          message = Message1(
-            avatarUrl: '',
-            sender: '',
-            time: '',
-            content: '',
-            number: 0,
-            online: false,
-          );
-        }
-        return Message(
-          sender: message.sender,
-          avatarUrl: message.avatarUrl,
-          time: message.time,
-          content: message.content,
-          number: message.number,
-          online: message.online,
-        );
-      });
-      break;
     case ProfileViewRoute:
       return MaterialPageRoute(builder: (BuildContext context) => Profile());
       break;

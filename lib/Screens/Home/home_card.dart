@@ -3,25 +3,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../models/post.dart';
 import 'HomeScreen.dart';
 
 class HomeCard extends StatefulWidget {
-  final String? dp;
-  final String? name;
-  final String? des;
-  final String img;
-  final String? hash;
+  final Post post;
   final VoidCallback onRepost;
-  
 
-  HomeCard(
-      {Key? key,
-      required this.dp,
-      required this.name,
-      required this.des,
-      required this.hash,
-      required this.onRepost,
-      required this.img})
+  HomeCard({Key? key, required this.onRepost, required this.post})
       : super(key: key);
   @override
   _HomeCardState createState() => _HomeCardState();
@@ -55,7 +44,7 @@ class _HomeCardState extends State<HomeCard> {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: AssetImage(widget.img),
+                    image: AssetImage(widget.post.product.image),
                   ),
                   borderRadius: BorderRadius.circular(35),
                 ),
@@ -63,6 +52,58 @@ class _HomeCardState extends State<HomeCard> {
             ),
           ),
           //Side-bar Container
+          Positioned(
+            top: 30,
+            left: 30,
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(81, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.post.product.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(102, 217, 75, 252),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: widget.post.product.staticPrice != null
+                        ? Text(
+                            "\$ ${widget.post.product.staticPrice!.toString()}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 20,
+                            ),
+                          )
+                        : Text(
+                            'Open Price',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(181, 120, 255, 163),
+                              fontSize: 20,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Positioned(
             right: -5,
             top: MediaQuery.of(context).size.shortestSide < 600
@@ -147,7 +188,7 @@ class _HomeCardState extends State<HomeCard> {
                           //   ),
                           // ),
                           GestureDetector(
-                            onTap:widget.onRepost,
+                            onTap: widget.onRepost,
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(100),
@@ -196,7 +237,7 @@ class _HomeCardState extends State<HomeCard> {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundImage: AssetImage(widget.dp!),
+                        backgroundImage: AssetImage(widget.post.author.profile),
                         radius: 25,
                       ),
                       SizedBox(
@@ -205,18 +246,19 @@ class _HomeCardState extends State<HomeCard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
                           Text(
-                            widget.name!,
+                            widget.post.author.username,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontSize: 20,
                             ),
                           ),
-                          SizedBox(height:7),
+                          SizedBox(height: 7),
                           Text(
-                            'Repost from Hashir',
+                            widget.post.isRepost
+                                ? 'Repost from ${widget.post.product.owner.username}'
+                                : 'Original Owner',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -231,7 +273,7 @@ class _HomeCardState extends State<HomeCard> {
                     height: 20,
                   ),
                   Text(
-                    "It is a long established fact that a reader will be distracted by it",
+                    widget.post.caption,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -242,7 +284,7 @@ class _HomeCardState extends State<HomeCard> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.hash!,
+                          widget.post.product.description,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xff00d289),

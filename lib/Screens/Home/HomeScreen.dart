@@ -2,6 +2,7 @@ import 'package:dara_store/Screens/Home/home_card.dart';
 import 'package:dara_store/components/Custom_NavBar.dart';
 import 'package:dara_store/components/data.dart';
 import 'package:dara_store/components/enums.dart';
+import 'package:dara_store/models/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -238,7 +239,7 @@ class _HomeState extends State<HomeScreen> {
                       ...List.generate(
                         posts.length,
                         (index) {
-                          Map post = posts[index];
+                          Post post = posts[index];
                           return HomeCard(
                             onRepost: () => showDialog(
                               context: context,
@@ -248,11 +249,7 @@ class _HomeState extends State<HomeScreen> {
                                 );
                               },
                             ),
-                            dp: post["dp"],
-                            name: post['name'],
-                            img: "assets/images/dm$index.jpg",
-                            des: post['des'],
-                            hash: post['hash'],
+                            post: post,
                           );
                         },
                       ),

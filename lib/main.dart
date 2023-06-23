@@ -12,10 +12,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Social App Ui Kit',
+      title: 'Mirv_Store',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.white,
+        primaryColor: Color.fromARGB(255, 234, 234, 234),
         fontFamily: "Sans serif",
         primarySwatch: colorCustom,
         visualDensity: VisualDensity.adaptivePlatformDensity,

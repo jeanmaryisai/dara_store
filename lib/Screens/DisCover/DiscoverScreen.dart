@@ -4,6 +4,9 @@ import 'package:dara_store/components/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../models/user.dart';
+import '../../utils.dart';
+
 class Discover extends StatefulWidget {
   static String routeName = "/discover";
   @override
@@ -13,6 +16,7 @@ class Discover extends StatefulWidget {
 class _DiscoverState extends State<Discover> {
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -25,9 +29,9 @@ class _DiscoverState extends State<Discover> {
               padding: const EdgeInsets.only(top: 35),
               child: ListView.builder(
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
-                itemCount: friends.length,
+                itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
-                  Map friend = friends[index];
+                  User friend = users[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 10),
@@ -52,15 +56,15 @@ class _DiscoverState extends State<Discover> {
                           padding: const EdgeInsets.all(2.0),
                           child: CircleAvatar(
                             backgroundImage: AssetImage(
-                              friend["dp"],
+                              friend.profile,
                             ),
                           ),
                         ),
                       ),
                       contentPadding: EdgeInsets.all(0),
-                      title: Text(friend['name']),
-                      subtitle: Text(friend['status']),
-                      trailing: friend['isAccept']
+                      title: Text(friend.username),
+                      subtitle: Text(friend.bio),
+                      trailing:getFollowerInfo(currentUser,friend)['iFollow']!
                           ? Container(
                               width: 100.0,
                               height: 38.0,
