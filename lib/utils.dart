@@ -7,6 +7,7 @@ import 'models/chat.dart';
 import 'models/comment.dart';
 import 'models/message.dart';
 import 'models/post.dart';
+import 'models/trade.dart';
 
 User? getUserByName(String name) {
   for (var element in users) {
@@ -72,7 +73,7 @@ void repost(Post post, String caption) {
       author: currentUser,
       isRepost: true);
   posts.add(post2);
-  
+
   Fluttertoast.showToast(msg: 'Reposted');
 }
 
@@ -84,9 +85,21 @@ List<User> getFollowing(User user) {
   return follower;
 }
 
+void confirmTrade(Trade trade, bool accept) {
+
+    trades.firstWhere((element) => element.id == trade.id).isAccepted=accept;
+    Fluttertoast.showToast(msg:accept? 'The trade has been accepted':'The trade has been decline');
+}
+
 String generateUniqueId() {
   var uuid = Uuid();
   return uuid.v4();
+}
+
+bool isTradeUnactive(Trade trade) {
+  return trade.isAccepted != null ||
+      trade.product.isSold ||
+      !trade.product.isAvailable;
 }
 
 void updateChat(Chat chat, Message message) {
