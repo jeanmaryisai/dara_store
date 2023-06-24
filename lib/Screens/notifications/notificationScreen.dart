@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
+import '../../components/data.dart';
+import '../../models/comment.dart';
+import '../../models/notifs.dart';
+import '../../models/post.dart';
+import '../../utils.dart';
 
 class NotificationPage extends StatefulWidget {
   @override
@@ -6,7 +13,7 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  List<NotificationModel> notifications = [];
+  List<NotificationCustom> notifications = [];
   ScrollController _scrollController = ScrollController();
   int pageSize = 20;
   bool isLoading = false;
@@ -39,17 +46,8 @@ class _NotificationPageState extends State<NotificationPage> {
     // Simulate API request
     await Future.delayed(Duration(seconds: 2));
 
-    // Generate dummy notifications
-    List<NotificationModel> newNotifications = List.generate(
-      pageSize,
-      (index) => NotificationModel(
-        id: index.toString(),
-        message: 'Notification ${index + 1}',
-      ),
-    );
-
     setState(() {
-      notifications.addAll(newNotifications);
+      notifications.addAll(notifs.getRange(0, pageSize));
     });
   }
 
@@ -62,17 +60,9 @@ class _NotificationPageState extends State<NotificationPage> {
       // Simulate API request
       await Future.delayed(Duration(seconds: 2));
 
-      // Generate more dummy notifications
-      List<NotificationModel> newNotifications = List.generate(
-        pageSize,
-        (index) => NotificationModel(
-          id: (notifications.length + index).toString(),
-          message: 'Notification ${notifications.length + index + 1}',
-        ),
-      );
-
       setState(() {
-        notifications.addAll(newNotifications);
+        notifications.addAll(notifs.getRange(
+            notifications.length, notifications.length + pageSize));
         isLoading = false;
       });
     }
@@ -82,20 +72,60 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        elevation: 3,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: SvgPicture.asset(
+              "assets/icons/back-arrow.svg",
+              color: Colors.black,
+            ),
+          ),
+        ),
       ),
       body: ListView.builder(
         controller: _scrollController,
         itemCount: notifications.length + 1,
         itemBuilder: (context, index) {
           if (index < notifications.length) {
+            NotificationCustom notif = notifications[index];
             // Display notification item
             return ListTile(
-              title: GestureDetector(
-                  onTap: () {
-                    showCommentDialog(context);
-                  },
-                  child: Text(notifications[index].message)),
+              leading: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(50),
+                  color: Colors.white,
+                ),
+                height: 55,
+                width: 55,
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(
+                      notif.isAbout == null
+                          ? defaultimg
+                          : notif.isAbout!.profile,
+                    ),
+                  ),
+                ),
+              ),
+              contentPadding: EdgeInsets.all(0),
+              title: Text(
+                notif.isAbout == null ? 'Mirv_Store' : notif.isAbout!.username,
+              ),
+              subtitle: Text(notif.message),
+              onTap: () {},
             );
           } else if (isLoading) {
             // Display loading indicator at the end of the list while more notifications are being loaded
@@ -112,46 +142,9 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
 
-class NotificationModel {
-  final String id;
-  final String message;
-
-  NotificationModel({required this.id, required this.message});
-}
-
-List<Comment> comments = [
-  Comment(
-    username: 'John Doe',
-    userAvatar: 'assets/images/dm1.jpg',
-    comment: 'Great post!',
-  ),
-  Comment(
-    username: 'Jane Smith',
-    userAvatar: 'assets/images/dm1.jpg',
-    comment: 'I love this!',
-  ),
-  Comment(
-    username: 'Mark Johnson',
-    userAvatar: 'assets/images/dm1.jpg',
-    comment: 'Awesome content!',
-  ),
-  // Add more comments here
-];
-
-class Comment {
-  final String username;
-  final String userAvatar;
-  final String comment;
-
-  Comment({
-    required this.username,
-    required this.userAvatar,
-    required this.comment,
-  });
-}
 // In this example, the comments list contains instances of the Comment class. Each comment h
 
-void showCommentDialog(BuildContext context) {
+void showCommentDialog(BuildContext context, Post post) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -161,6 +154,7 @@ void showCommentDialog(BuildContext context) {
       ),
     ),
     builder: (BuildContext context) {
+      TextEditingController _controller = TextEditingController();
       return Container(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -183,6 +177,7 @@ void showCommentDialog(BuildContext context) {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _controller,
                       decoration: InputDecoration(
                         hintText: 'Add a comment...',
                         border: InputBorder.none,
@@ -195,6 +190,8 @@ void showCommentDialog(BuildContext context) {
                       color: Colors.blue,
                     ),
                     onPressed: () {
+                      addCommentToPost(_controller.text, post);
+                      _controller.clear();
                       // Add comment functionality
                     },
                   ),
@@ -203,20 +200,22 @@ void showCommentDialog(BuildContext context) {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: comments.length,
+                itemCount: getCommentsByPost(post).length,
                 itemBuilder: (BuildContext context, int index) {
+                  List<Comment> _comments = getCommentsByPost(post);
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(comments[index].userAvatar),
+                      backgroundImage:
+                          AssetImage(_comments[index].author.profile),
                     ),
                     title: Text(
-                      comments[index].username,
+                      _comments[index].author.username,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
-                      comments[index].comment,
+                      _comments[index].comment,
                       style: TextStyle(
                         color: Colors.grey[700],
                       ),

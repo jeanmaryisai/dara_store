@@ -1,22 +1,14 @@
 import 'package:dara_store/Screens/Inbox/conversation.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/chat.dart';
+
 class ChatItem extends StatefulWidget {
-  final String? dp;
-  final String? name;
-  final String? time;
-  final String? msg;
-  final bool? isOnline;
-  final int? counter;
+  final Chat chat;
 
   ChatItem({
     Key? key,
-    required this.dp,
-    required this.name,
-    required this.time,
-    required this.msg,
-    required this.isOnline,
-    required this.counter,
+    required this.chat
   }) : super(key: key);
 
   @override
@@ -53,45 +45,45 @@ class _ChatItemState extends State<ChatItem> {
                   padding: const EdgeInsets.all(2.0),
                   child: CircleAvatar(
                     backgroundImage: AssetImage(
-                      "${widget.dp}",
+                      "${widget.chat.theOrther().profile}",
                     ),
                   ),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 0.0,
-              left: 6.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                height: 13,
-                width: 13,
-                child: Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: widget.isOnline! ? Color(0xff651CE5) : Colors.grey,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    height: 9,
-                    width: 9,
-                  ),
-                ),
-              ),
-            ),
+            // Positioned(
+            //   bottom: 0.0,
+            //   left: 6.0,
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(6),
+            //     ),
+            //     height: 13,
+            //     width: 13,
+            //     child: Center(
+            //       child: Container(
+            //         decoration: BoxDecoration(
+            //           color: widget.isOnline! ? Color(0xff651CE5) : Colors.grey,
+            //           borderRadius: BorderRadius.circular(6),
+            //         ),
+            //         height: 9,
+            //         width: 9,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         title: Text(
-          "${widget.name}",
+          "${widget.chat.theOrther().username}",
           maxLines: 1,
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
-          "${widget.msg}",
+          widget.chat.getMessagesOrderedByMostRecent().first.captionSTR(),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
@@ -100,38 +92,37 @@ class _ChatItemState extends State<ChatItem> {
           children: <Widget>[
             SizedBox(height: 10),
             Text(
-              "${widget.time}",
+              "${widget.chat.messages.first.timeAgo()}",
               style: TextStyle(
                 fontWeight: FontWeight.w300,
                 fontSize: 11,
               ),
             ),
             SizedBox(height: 5),
-            widget.counter == 0
-                ? SizedBox()
-                : Container(
-                    padding: EdgeInsets.all(1),
-                    decoration: BoxDecoration(
-                      color: Color(0xff00d289),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 11,
-                      minHeight: 11,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 1, left: 5, right: 5),
-                      child: Text(
-                        "${widget.counter}",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                SizedBox()
+                // : Container(
+                //     padding: EdgeInsets.all(1),
+                //     decoration: BoxDecoration(
+                //       color: Color(0xff00d289),
+                //       borderRadius: BorderRadius.circular(6),
+                //     ),
+                //     constraints: BoxConstraints(
+                //       minWidth: 11,
+                //       minHeight: 11,
+                //     ),
+                //     child: Padding(
+                //       padding: EdgeInsets.only(top: 1, left: 5, right: 5),
+                //       child: Text(
+                //         "${widget.counter}",
+                //         style: TextStyle(
+                //           color: Colors.white,
+                //           fontWeight: FontWeight.bold,
+                //           fontSize: 10,
+                //         ),
+                //         textAlign: TextAlign.center,
+                //       ),
+                //     ),
+                //   ),
           ],
         ),
         onTap: () {
@@ -139,8 +130,7 @@ class _ChatItemState extends State<ChatItem> {
             MaterialPageRoute(
               builder: (BuildContext context) {
                 return Conversation(
-                  dp: widget.dp,
-                  name: widget.name,
+                  chat:widget.chat
                 );
               },
             ),

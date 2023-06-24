@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/Product.dart';
 import '../models/chat.dart';
+import '../models/comment.dart';
 import '../models/followers.dart';
 import '../models/message.dart';
 import '../models/notifs.dart';
@@ -67,10 +68,8 @@ List<String> titles = [
 List<User> users = List.generate(
     11,
     (index) => User(
-        id: index,
         profile: "assets/images/dm${random.nextInt(4)}.jpg",
         username: names[index],
-        likedPosts: [],
         password: 'admin'));
 
 List messages = [
@@ -125,79 +124,74 @@ List<Product> products = List.generate(
 List<NotificationCustom> notifs = [
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message:
         "${names[random.nextInt(10)]} and ${random.nextInt(100)} others liked your post",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} mentioned you in a comment",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} shared your post",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} commented on your post",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} replied to your comment",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} reacted to your comment",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} asked you to join a Group️",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} asked you to like a page",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "You have memories with ${names[random.nextInt(10)]}",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message:
         "${names[random.nextInt(10)]} Tagged you and ${random.nextInt(100)} others in a post",
   ),
   NotificationCustom(
     receiver: currentUser,
-    concern: getUserByName(names[random.nextInt(10)]),
+    isAbout: getUserByName(names[random.nextInt(10)]),
     message: "${names[random.nextInt(10)]} Sent you a friend request",
   ),
 ];
 
+String defaultimg='';
 // List<Trade> trades=
 
 List<Post> posts = List.generate(
-    20,
+    11,
     (index) => Post(
           author: getUserByName(names[random.nextInt(10)])!,
           caption: messages[random.nextInt(10)],
           product: products[random.nextInt(18)],
           isRepost: random.nextBool(),
         ));
-
-List<Chat> chats = List.generate(
-    13,
-    (index) => Chat(
-        message: [], user1: currentUser, user2: users[random.nextInt(10)]));
-
 List<Message> messagesGenerales = List.generate(
     10,
     (index) => Message(
@@ -206,10 +200,29 @@ List<Message> messagesGenerales = List.generate(
         sender: index % 2 == 0 ? currentUser : users[3],
         trade: index % 3 == 0 ? trades[random.nextInt(5)] : null));
 
-List<Trade> trades = List.genarate(
-  6,
-  (index)=>Trade(amout: random.nextDouble()*100000,)
-);
+List<Chat> chats = List.generate(
+    13,
+    (index) => Chat(
+        messages: List.generate(
+            10,
+            (index) => Message(
+                message: messages[random.nextInt(10)],
+                send: DateTime.now(),
+                sender: index % 2 == 0 ? currentUser : users[3],
+                trade: index % 3 == 0 ? trades[random.nextInt(5)] : null)),
+        user1: currentUser,
+        user2: users[random.nextInt(10)]));
+
+List<Trade> trades = List.generate(
+    6,
+    (index) => Trade(
+        amout: random.nextDouble() * 100000,
+        sender: index % 2 == 0 ? currentUser : users[3],
+        receiver: index % 2 == 1 ? currentUser : users[3],
+        isAccepted: false,
+        product: products[index],
+        created: DateTime.now(),
+        buyer: users[3]));
 
 List conversation = List.generate(
     10,
@@ -234,5 +247,13 @@ List<Followers> followersGenerale = [
   Followers(first: users[9], followedBack: currentUser, isFollowBack: false),
   Followers(first: users[10], followedBack: currentUser, isFollowBack: true)
 ];
+
+List<Comment> comments=List.generate(
+  50, (index) => Comment(
+    comment:messages[random.nextInt(10)],
+    author:users[random.nextInt(10)], 
+    post:posts[random.nextInt(10)],
+    created: DateTime.now().subtract(Duration(minutes: random.nextInt(20))
+  )));
 
 User currentUser = users[0];

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../models/chat.dart';
+
 class InboxScreen extends StatefulWidget {
   static String routeName = "/inbox";
   @override
@@ -81,16 +83,11 @@ class _ChatsState extends State<InboxScreen>
                   Expanded(
                     child: ListView.builder(
                       padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
-                      itemCount: chats.length,
+                      itemCount: getChatsOrderedByMostRecent().length,
                       itemBuilder: (BuildContext context, int index) {
-                        Map chat = chats[index];
+                        Chat chat = getChatsOrderedByMostRecent()[index];
                         return ChatItem(
-                          dp: chat['dp'],
-                          name: chat['name'],
-                          isOnline: chat['isOnline'],
-                          counter: chat['counter'],
-                          msg: chat['msg'],
-                          time: chat['time'],
+                          chat:chat
                         );
                       },
                     ),

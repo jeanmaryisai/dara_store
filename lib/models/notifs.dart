@@ -5,10 +5,10 @@ import 'user.dart';
 class NotificationCustom extends Identifiable {
   User receiver;
   String message;
-  User? concern;
+  User? isAbout;
   NotificationCustom({
     required this.receiver,
     required this.message,
-    this.concern,
+    this.isAbout,
   });
 }

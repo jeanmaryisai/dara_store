@@ -3,14 +3,18 @@ import 'package:dara_store/Screens/Inbox/chat_bubble.dart';
 import 'package:dara_store/components/data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../../models/chat.dart';
+import '../../models/message.dart';
+import '../../utils.dart';
 
 class Conversation extends StatefulWidget {
-  final String? dp, name;
+  final Chat chat;
 
   Conversation({
     Key? key,
-    required this.dp,
-    required this.name,
+    required this.chat,
   }) : super(key: key);
   @override
   _ConversationState createState() => _ConversationState();
@@ -21,9 +25,10 @@ class _ConversationState extends State<Conversation> {
   String name = names[random.nextInt(10)];
   ScrollController _scrollController = ScrollController();
 
-
   @override
   Widget build(BuildContext context) {
+    String _userInput = '';
+    TextEditingController controller = TextEditingController();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -65,7 +70,7 @@ class _ConversationState extends State<Conversation> {
                       padding: const EdgeInsets.all(2.0),
                       child: CircleAvatar(
                         backgroundImage: AssetImage(
-                          "${widget.dp}",
+                          "${widget.chat.theOrther().profile}",
                         ),
                       ),
                     ),
@@ -79,7 +84,7 @@ class _ConversationState extends State<Conversation> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        widget.name!,
+                        widget.chat.theOrther().username,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -87,14 +92,7 @@ class _ConversationState extends State<Conversation> {
                         ),
                       ),
                       SizedBox(height: 5),
-                      Text(
-                        "Online",
-                        style: TextStyle(
-                          color: Color(0xff651CE5),
-                          fontWeight: FontWeight.w400,
-                          fontSize: 11,
-                        ),
-                      ),
+                      
                     ],
                   ),
                 ),
@@ -118,25 +116,13 @@ class _ConversationState extends State<Conversation> {
             children: <Widget>[
               Flexible(
                 child: ListView.builder(
-                   controller: _scrollController,
+                  controller: _scrollController,
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  itemCount: conversation.length,
+                  itemCount: widget.chat.messages.length,
                   reverse: true,
                   itemBuilder: (BuildContext context, int index) {
-                    Map msg = conversation[index];
-                    return ChatBubble(
-                      message: msg['type'] == "text"
-                          ? messages[random.nextInt(10)]
-                          : "assets/images/px$index.jpg",
-                      username: msg["username"],
-                      time: msg["time"],
-                      type: msg['type'],
-                      replyText: msg["replyText"],
-                      isMe: msg['isMe'],
-                      isGroup: msg['isGroup'],
-                      isReply: msg['isReply'],
-                      replyName: name,
-                    );
+                    Message msg = widget.chat.getMessagesOrderedByMostRecent()[index];
+                    return ChatBubble(msg: msg);
                   },
                 ),
               ),
@@ -161,6 +147,7 @@ class _ConversationState extends State<Conversation> {
                         ),
                         Flexible(
                           child: TextField(
+                            controller: controller,
                             style: TextStyle(
                               fontSize: 15.0,
                               color:
@@ -179,15 +166,34 @@ class _ConversationState extends State<Conversation> {
                                     .color,
                               ),
                             ),
+                            onChanged: (value) {
+                              // Update the userInput variable whenever the text field value changes
+                              _userInput = value;
+                            },
                             maxLines: null,
                           ),
                         ),
                         IconButton(
                           icon: Icon(
-                            Icons.mic,
+                            Icons.send,
                             color: Theme.of(context).accentColor,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (_userInput == '') {
+                              Fluttertoast.showToast(
+                                  msg:
+                                      'Vous pouvez pas envoyer un message vide');
+                            } else {
+                              Message _message = Message(
+                                sender: currentUser,
+                                message: _userInput,
+                                send: DateTime.now(),
+                              );
+                              controller.clear();
+                              updateChat(widget.chat, _message);
+                              setState(() {});
+                            }
+                          },
                         )
                       ],
                     ),

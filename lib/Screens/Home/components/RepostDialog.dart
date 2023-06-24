@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../models/post.dart';
+import '../../../utils.dart';
+
 class RepostDialog extends StatelessWidget {
-  final String caption;
+  final Post post;
 
-  RepostDialog({required this.caption});
-
+  RepostDialog({required this.post});
+TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -24,7 +27,7 @@ class RepostDialog extends StatelessWidget {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundImage: AssetImage('assets/images/dm1.jpg'),
+                        backgroundImage: AssetImage(post.product.owner.profile),
                         radius: 25,
                       ),
                       SizedBox(
@@ -34,7 +37,7 @@ class RepostDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Carmen',
+                            post.product.owner.username,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -43,7 +46,7 @@ class RepostDialog extends StatelessWidget {
                           ),
                           SizedBox(height: 7),
                           Text(
-                            'ejkrosagfahfdaklhald jfad jlkfda jlka j',
+                            "This is the ${post.product.title} put on the market by ${post.product.owner.username}",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(255, 189, 187, 187),
@@ -58,7 +61,7 @@ class RepostDialog extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                    "It is a long established fact that a reader will be distracted by it",
+                    "When you repost a Product, anyone who is interested by it will be automatically be redirected by the owner, but you will keep the likes on your page",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 189, 187, 187),
@@ -75,7 +78,7 @@ class RepostDialog extends StatelessWidget {
             Container(
               height: 120,
               child: Image.asset(
-                'assets/images/dm1.jpg',
+                post.product.image,
                 fit: BoxFit.cover,
               ),
             ),
@@ -83,7 +86,9 @@ class RepostDialog extends StatelessWidget {
             // Caption input field
 
             TextFormField(
+              controller: _controller,
               decoration: InputDecoration(
+              
                 hintText: 'Write a caption...',
                 border: OutlineInputBorder(),
               ),
@@ -95,6 +100,7 @@ class RepostDialog extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      repost(post,_controller.text);
                       // TODO: Handle post logic
                       Navigator.pop(context); // Close the dialog
                     },

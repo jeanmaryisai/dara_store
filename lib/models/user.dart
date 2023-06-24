@@ -7,12 +7,10 @@ class User extends Identifiable {
   String password;
   String bio;
   String profile;
-  List<Post> likedPosts;
   User(
       {
       required this.username,
       required this.password,
       required this.profile,
-      required this.likedPosts,
       this.bio = "Hello I am user Mirv_store"});
 }

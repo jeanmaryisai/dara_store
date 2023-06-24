@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 
+import '../../listWiew.dart';
 import '../notifications/notificationScreen.dart';
+import '../pofilePage.dart';
 import 'components/RepostDialog.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,7 +49,7 @@ class _HomeState extends State<HomeScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      showCommentDialog(context);
+                                      // showCommentDialog(context);
                                     },
                                     child: SvgPicture.asset(
                                       "assets/icons/menu.svg",
@@ -62,7 +64,9 @@ class _HomeState extends State<HomeScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              NotificationPage(),
+                                              // NotificationPage(),
+                                              // PostGridPage(),
+                                              MyListView(),
                                         ),
                                       );
                                       // showDialog(
@@ -196,7 +200,7 @@ class _HomeState extends State<HomeScreen> {
                                                             2.0),
                                                     child: CircleAvatar(
                                                       backgroundImage: AssetImage(
-                                                          'assets/images/avtar.jpg'),
+                                                          currentUser.profile),
                                                       radius: 25,
                                                     ),
                                                   ),
@@ -204,7 +208,7 @@ class _HomeState extends State<HomeScreen> {
                                               ),
                                               Expanded(
                                                 child: Text(
-                                                  "Alina",
+                                                  currentUser.username,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
@@ -249,6 +253,7 @@ class _HomeState extends State<HomeScreen> {
                                 );
                               },
                             ),
+                            onComment:()=>showCommentDialog(context: context, post:post),
                             post: post,
                           );
                         },
