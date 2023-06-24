@@ -257,3 +257,7 @@ List<Comment> comments=List.generate(
   )));
 
 User currentUser = users[0];
+
+enum quotaValue={
+  Likeposts=10,
+}

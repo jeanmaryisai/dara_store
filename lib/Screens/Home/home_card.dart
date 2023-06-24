@@ -9,8 +9,9 @@ import 'HomeScreen.dart';
 class HomeCard extends StatefulWidget {
   final Post post;
   final VoidCallback onRepost;
+  final VoidCallback onComment;
 
-  HomeCard({Key? key, required this.onRepost, required this.post})
+  HomeCard({Key? key, required this.onRepost, required this.post, required this.onComment})
       : super(key: key);
   @override
   _HomeCardState createState() => _HomeCardState();
@@ -82,9 +83,10 @@ class _HomeCardState extends State<HomeCard> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: widget.post.product.staticPrice != null
+                    child:!widget.post.product.isSold? 
+                    widget.post.product.staticPrice != null
                         ? Text(
-                            "\$ ${widget.post.product.staticPrice!.toString()}",
+                            "\$ ${widget.post.product.staticPrice!.toStringAsFixed(2)}",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(255, 255, 255, 255),
@@ -96,6 +98,14 @@ class _HomeCardState extends State<HomeCard> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(181, 120, 255, 163),
+                              fontSize: 20,
+                            ),
+                          )
+                          :Text(
+                            'Sold',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(181, 237, 241, 239),
                               fontSize: 20,
                             ),
                           ),
@@ -172,21 +182,24 @@ class _HomeCardState extends State<HomeCard> {
                               });
                             },
                           ),
-                          // Container(
-                          //   decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(100),
-                          //     color: Colors.white.withOpacity(0.4),
-                          //   ),
-                          //   height: 60,
-                          //   width: 60,
-                          //   child: Padding(
-                          //     padding: const EdgeInsets.all(17.0),
-                          //     child: SvgPicture.asset(
-                          //       "assets/icons/comment-option.svg",
-                          //       color: Color(0xffffffff),
-                          //     ),
-                          //   ),
-                          // ),
+                          GestureDetector(
+                            onTap: widget.onComment,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(100),
+                                color: Colors.white.withOpacity(0.4),
+                              ),
+                              height: 60,
+                              width: 60,
+                              child: Padding(
+                                padding: const EdgeInsets.all(17.0),
+                                child: SvgPicture.asset(
+                                  "assets/icons/comment-option.svg",
+                                  color: Color(0xffffffff),
+                                ),
+                              ),
+                            ),
+                          ),
                           GestureDetector(
                             onTap: widget.onRepost,
                             child: Container(
@@ -205,6 +218,7 @@ class _HomeCardState extends State<HomeCard> {
                               ),
                             ),
                           ),
+                          widget.post.product.isSold?SizedBox():
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(100),

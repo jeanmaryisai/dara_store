@@ -8,11 +8,15 @@ class Product extends Identifiable {
   String image;
   double? staticPrice;
   User owner;
+  bool isSold;
+  bool isAvailable;
   Product({
     required this.title,
     required this.description,
     required this.image,
     this.staticPrice = 0.0,
+    this.isSold = false,
+    this.isAvailable=true,
     required this.owner,
   });
 }

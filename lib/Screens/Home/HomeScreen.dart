@@ -64,9 +64,9 @@ class _HomeState extends State<HomeScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              // NotificationPage(),
+                                              NotificationPage(),
                                               // PostGridPage(),
-                                              MyListView(),
+                                              // MyListView(),
                                         ),
                                       );
                                       // showDialog(
@@ -82,10 +82,10 @@ class _HomeState extends State<HomeScreen> {
                                     ),
                                   ),
                                   SizedBox(width: 20),
-                                  SvgPicture.asset(
-                                    "assets/icons/search.svg",
-                                    height: 30,
-                                  ),
+                                  // SvgPicture.asset(
+                                  //   "assets/icons/search.svg",
+                                  //   height: 30,
+                                  // ),
                                 ],
                               ),
                               Spacer(),
@@ -131,7 +131,6 @@ class _HomeState extends State<HomeScreen> {
                                                 leading: Icon(Icons.edit),
                                                 title: Text('Change Bio'),
                                                 onTap: () {
-                                                  
                                                   // Handle change bio action
                                                   Navigator.pop(context);
                                                   showBioDialog(context);
@@ -143,8 +142,9 @@ class _HomeState extends State<HomeScreen> {
                                                     'Change Profile Picture'),
                                                 onTap: () {
                                                   // Handle change profile picture action
-                                                  
-                                                  Navigator.pop(context);showCropDialog(context);
+
+                                                  Navigator.pop(context);
+                                                  showCropDialog(context);
                                                   // Implement the logic to change the profile picture
                                                 },
                                               ),
@@ -199,8 +199,9 @@ class _HomeState extends State<HomeScreen> {
                                                         const EdgeInsets.all(
                                                             2.0),
                                                     child: CircleAvatar(
-                                                      backgroundImage: AssetImage(
-                                                          currentUser.profile),
+                                                      backgroundImage:
+                                                          AssetImage(currentUser
+                                                              .profile),
                                                       radius: 25,
                                                     ),
                                                   ),
@@ -249,11 +250,13 @@ class _HomeState extends State<HomeScreen> {
                               context: context,
                               builder: (BuildContext context) {
                                 return RepostDialog(
-                                  caption: 'fsgsfgfssffs',
+                                  post: post,
                                 );
                               },
                             ),
-                            onComment:()=>showCommentDialog(context: context, post:post),
+                            onComment: () {
+                              showCommentDialog(context,post);
+                            },
                             post: post,
                           );
                         },

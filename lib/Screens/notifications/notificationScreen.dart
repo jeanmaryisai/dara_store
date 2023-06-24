@@ -13,66 +13,67 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  List<NotificationCustom> notifications = [];
-  ScrollController _scrollController = ScrollController();
-  int pageSize = 20;
-  bool isLoading = false;
+  // List<NotificationCustom> notifications = [];
+  // ScrollController _scrollController = ScrollController();
+  // int pageSize = 20;
+  // bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Fetch initial notifications
-    fetchNotifications();
-    // Add scroll listener
-    _scrollController.addListener(scrollListener);
+    // // Fetch initial notifications
+    // fetchNotifications();
+    // // Add scroll listener
+    // _scrollController.addListener(scrollListener);
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _scrollController.dispose();
+  //   super.dispose();
+  // }
 
-  void scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      // User reached the bottom of the list
-      loadMoreNotifications();
-    }
-  }
+  // void scrollListener() {
+  //   if (_scrollController.offset >=
+  //           _scrollController.position.maxScrollExtent &&
+  //       !_scrollController.position.outOfRange) {
+  //     // User reached the bottom of the list
+  //     loadMoreNotifications();
+  //   }
+  // }
 
-  Future<void> fetchNotifications() async {
-    // Simulate API request
-    await Future.delayed(Duration(seconds: 2));
+  // Future<void> fetchNotifications() async {
+  //   // Simulate API request
+  //   await Future.delayed(Duration(seconds: 2));
 
-    setState(() {
-      notifications.addAll(notifs.getRange(0, pageSize));
-    });
-  }
+  //   setState(() {
+  //     notifications.addAll(notifs.getRange(1, pageSize));
+  //   });
+  // }
 
-  Future<void> loadMoreNotifications() async {
-    if (!isLoading) {
-      setState(() {
-        isLoading = true;
-      });
+  // Future<void> loadMoreNotifications() async {
+  //   if (!isLoading) {
+  //     setState(() {
+  //       isLoading = true;
+  //     });
 
-      // Simulate API request
-      await Future.delayed(Duration(seconds: 2));
+  //     // Simulate API request
+  //     await Future.delayed(Duration(seconds: 2));
 
-      setState(() {
-        notifications.addAll(notifs.getRange(
-            notifications.length, notifications.length + pageSize));
-        isLoading = false;
-      });
-    }
-  }
+  //     setState(() {
+  //       notifications.addAll(notifs.getRange(
+  //           notifications.length, notifications.length + pageSize));
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 3,
+        title:Text('Notification'),
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -86,56 +87,52 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ),
       ),
+      
       body: ListView.builder(
-        controller: _scrollController,
-        itemCount: notifications.length + 1,
+        // controller: _scrollController,
+        itemCount: notifs.length,
         itemBuilder: (context, index) {
-          if (index < notifications.length) {
-            NotificationCustom notif = notifications[index];
+          
+            NotificationCustom notif = notifs[index];
             // Display notification item
-            return ListTile(
-              leading: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.white,
-                ),
-                height: 55,
-                width: 55,
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage(
-                      notif.isAbout == null
-                          ? defaultimg
-                          : notif.isAbout!.profile,
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                leading: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.white,
+                  ),
+                  height: 55,
+                  width: 55,
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage(
+                        notif.isAbout == null
+                            ? defaultimg
+                            : notif.isAbout!.profile,
+                      ),
                     ),
                   ),
                 ),
+                contentPadding: EdgeInsets.all(0),
+                title: Text(
+                  notif.isAbout == null ? 'Mirv_Store' : notif.isAbout!.username,
+                ),
+                subtitle: Text(notif.message),
+                onTap: () {},
               ),
-              contentPadding: EdgeInsets.all(0),
-              title: Text(
-                notif.isAbout == null ? 'Mirv_Store' : notif.isAbout!.username,
-              ),
-              subtitle: Text(notif.message),
-              onTap: () {},
             );
-          } else if (isLoading) {
-            // Display loading indicator at the end of the list while more notifications are being loaded
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            // Reached the end of the list and no more notifications to load
-            return SizedBox();
-          }
+          
         },
       ),
     );

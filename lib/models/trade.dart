@@ -6,7 +6,7 @@ import 'user.dart';
 class Trade extends Identifiable {
   User sender;
   User receiver;
-  bool isAccepted;
+  bool? isAccepted;
   Product product;
   double amout;
   DateTime created;
@@ -14,7 +14,7 @@ class Trade extends Identifiable {
   Trade({
     required this.sender,
     required this.receiver,
-    required this.isAccepted,
+    this.isAccepted,
     required this.product,
     required this.amout,
     required this.created,

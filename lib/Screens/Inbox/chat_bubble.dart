@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../components/data.dart';
 import '../../models/message.dart';
 import '../../models/trade.dart';
 import '../Home/HomeScreen.dart';
@@ -219,7 +220,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 ],
               )
             : PriceCard(
-                trade:widget.msg.trade!,
+                trade: widget.msg.trade!,
                 color: chatBubbleColor(),
                 onAccept: () {},
                 onNewPropose: (double) {},
@@ -274,168 +275,7 @@ class _PriceCardState extends State<PriceCard> {
             maxWidth: MediaQuery.of(context).size.width / 1.3,
             minWidth: 20.0,
           ),
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Container(
-                    child: Text(
-                      "Negociation",
-                      style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                      maxLines: 1,
-                      textAlign: TextAlign.left,
-                    ),
-                    alignment: Alignment.centerLeft,
-                  ),
-                  SizedBox(height: 16),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Image.asset(
-                      widget.trade.product.image,
-                      height: 130,
-                      width: MediaQuery.of(context).size.width / 1.3,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        SizedBox(height: 2.0),
-                        Container(
-                          child: Text(
-                            widget.trade.product.description,
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.headline6!.color,
-                              fontSize: 10.0,
-                            ),
-                            maxLines: 2,
-                          ),
-                          alignment: Alignment.centerLeft,
-                        ),
-                        SizedBox(height: 2.0),
-                        Container(
-                          child: Text(
-                            'Votre prix ne me satisfait pas, je vous propose donc:',
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.headline6!.color,
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 2,
-                          ),
-                          alignment: Alignment.centerLeft,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    // 'Price: \$${widget.pr.toStringAsFixed(2)}',
-                    'Price: \$${widget.trade.amout}',
-                    style: TextStyle(
-                      color: Theme.of(context).accentColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 1,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: widget.onAccept,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Accept',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: widget.onDecline,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Decline',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          newPrice = double.tryParse(value) ?? widget.trade.amout;
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'New Price',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                              width: 2.0,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).accentColor,
-                              width: 2.0,
-                            ),
-                          ),
-                        ),
-                      )),
-                      SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          widget.onNewPropose(newPrice);
-                          // showCommentDialog(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).accentColor,
-                          padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Icon(Icons.send),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child: NegociationCard(trade: widget.trade),
         ),
         Padding(
           padding: widget.isMe!
@@ -450,6 +290,357 @@ class _PriceCardState extends State<PriceCard> {
           ),
         ),
       ],
+    );
+  }
+
+  // Card negociationCard(BuildContext context, double newPrice, Trade trade) {
+  //   return Card(
+  //         elevation: 4,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(15),
+  //         ),
+  //         child: Padding(
+  //           padding: EdgeInsets.all(16),
+  //           child: Column(
+  //             children: [
+  //               Container(
+  //                 child: Text(
+  //                   "Negociation",
+  //                   style: TextStyle(
+  //                     color: Theme.of(context).accentColor,
+  //                     fontWeight: FontWeight.bold,
+  //                     fontSize: 17,
+  //                   ),
+  //                   maxLines: 1,
+  //                   textAlign: TextAlign.left,
+  //                 ),
+  //                 alignment: Alignment.centerLeft,
+  //               ),
+  //               SizedBox(height: 16),
+  //               ClipRRect(
+  //                 borderRadius: BorderRadius.circular(25),
+  //                 child: Image.asset(
+  //                   trade.product.image,
+  //                   height: 130,
+  //                   width: MediaQuery.of(context).size.width / 1.3,
+  //                   fit: BoxFit.cover,
+  //                 ),
+  //               ),
+  //               SizedBox(height: 12),
+  //               Padding(
+  //                 padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.min,
+  //                   children: <Widget>[
+  //                     SizedBox(height: 2.0),
+  //                     Container(
+  //                       child: Text(
+  //                      trade.product.description,
+  //                         style: TextStyle(
+  //                           color:
+  //                               Theme.of(context).textTheme.headline6!.color,
+  //                           fontSize: 10.0,
+  //                         ),
+  //                         maxLines: 2,
+  //                       ),
+  //                       alignment: Alignment.centerLeft,
+  //                     ),
+  //                     SizedBox(height: 2.0),
+  //                     Container(
+  //                       child: Text(
+  //                         'I am not satisfied with the current proposed price, I am proposing a new one',
+  //                         style: TextStyle(
+  //                           color:
+  //                               Theme.of(context).textTheme.headline6!.color,
+  //                           fontSize: 13.0,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                         maxLines: 2,
+  //                       ),
+  //                       alignment: Alignment.centerLeft,
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //               SizedBox(height: 8.0),
+  //               Text(
+  //                 // 'Price: \$${widget.pr.toStringAsFixed(2)}',
+  //                 'Price: \$${trade.amout}',
+  //                 style: TextStyle(
+  //                   color: Theme.of(context).accentColor,
+  //                   fontWeight: FontWeight.bold,
+  //                   fontSize: 16,
+  //                 ),
+  //                 maxLines: 1,
+  //               ),
+  //               SizedBox(height: 16),
+  //               ElevatedButton(
+  //                 onPressed: widget.onAccept,
+  //                 style: ElevatedButton.styleFrom(
+  //                   primary: Colors.green,
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 child: Text(
+  //                   'Accept',
+  //                   style: TextStyle(fontSize: 16),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 8),
+  //               ElevatedButton(
+  //                 onPressed: widget.onDecline,
+  //                 style: ElevatedButton.styleFrom(
+  //                   primary: Colors.red,
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 child: Text(
+  //                   'Decline',
+  //                   style: TextStyle(fontSize: 16),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 16),
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                       child: TextField(
+  //                     keyboardType: TextInputType.number,
+  //                     onChanged: (value) {
+  //                       newPrice = double.tryParse(value) ?? widget.trade.amout;
+  //                     },
+  //                     decoration: InputDecoration(
+  //                       labelText: 'New Price',
+  //                       border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         borderSide: BorderSide(
+  //                           color: Colors.blue,
+  //                           width: 2.0,
+  //                         ),
+  //                       ),
+  //                       enabledBorder: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         borderSide: BorderSide(
+  //                           color: Colors.grey,
+  //                           width: 1.0,
+  //                         ),
+  //                       ),
+  //                       focusedBorder: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         borderSide: BorderSide(
+  //                           color: Theme.of(context).accentColor,
+  //                           width: 2.0,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   )),
+  //                   SizedBox(width: 16),
+  //                   ElevatedButton(
+  //                     onPressed: () {
+  //                       widget.onNewPropose(newPrice);
+  //                       // showCommentDialog(context);
+  //                     },
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: Theme.of(context).accentColor,
+  //                       padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                       ),
+  //                     ),
+  //                     child: Icon(Icons.send),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  // }
+}
+
+class NegociationCard extends StatefulWidget {
+  final Trade trade;
+
+  const NegociationCard({super.key, required this.trade});
+
+  @override
+  _NegociationCardState createState() => _NegociationCardState();
+}
+
+class _NegociationCardState extends State<NegociationCard> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Container(
+              child: Text(
+                "Negociation",
+                style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                ),
+                maxLines: 1,
+                textAlign: TextAlign.left,
+              ),
+              alignment: Alignment.centerLeft,
+            ),
+            SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Image.asset(
+                widget.trade.product.image,
+                height: 130,
+                width: MediaQuery.of(context).size.width / 1.3,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 12),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(height: 2.0),
+                  Container(
+                    child: Text(
+                      widget.trade.product.description,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.headline6!.color,
+                        fontSize: 10.0,
+                      ),
+                      maxLines: 2,
+                    ),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  SizedBox(height: 2.0),
+                  Container(
+                    child: Text(
+                      widget.trade.product.isAvailable
+                          ? !widget.trade.product.isSold
+                              ? widget.trade.isAccepted == null
+                                  ? 'I am not satisfied with the current proposed price, I am proposing a new one'
+                                  : widget.trade.isAccepted!
+                                      ? widget.trade.buyer.id == currentUser.id
+                                          ? 'this post has been aggreed on both side please proceed to the checking and confirmation phase'
+                                          : 'this post has been aggreed on both side waiting for the checking and confirmation phase'
+                                      : 'This trade has been declined'
+                              : 'The product has benn Sold'
+                          : 'This product is currently unavailable',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.headline6!.color,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                    ),
+                    alignment: Alignment.centerLeft,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              // 'Price: \$${widget.pr.toStringAsFixed(2)}',
+              'Price: \$${widget.trade.amout.toStringAsFixed(2)}',
+              style: TextStyle(
+                color: Theme.of(context).accentColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              maxLines: 1,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Accept',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                primary: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Decline',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                    child: TextField(
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    newPrice = double.tryParse(value) ?? widget.trade.amout;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'New Price',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).accentColor,
+                        width: 2.0,
+                      ),
+                    ),
+                  ),
+                )),
+                SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // widget.onNewPropose(newPrice);
+                    // showCommentDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).accentColor,
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Icon(Icons.send),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

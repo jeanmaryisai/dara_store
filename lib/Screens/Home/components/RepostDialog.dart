@@ -7,7 +7,7 @@ class RepostDialog extends StatelessWidget {
   final Post post;
 
   RepostDialog({required this.post});
-TextEditingController _controller = TextEditingController();
+  TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -53,6 +53,16 @@ TextEditingController _controller = TextEditingController();
                               fontSize: 10,
                             ),
                           ),
+                          post.product.isSold
+                              ? Text(
+                                  "This product is already sold by ${post.product.owner.username}, you can wiew it but no one can but it annymore",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 189, 187, 187),
+                                    fontSize: 10,
+                                  ),
+                                )
+                              : SizedBox(),
                         ],
                       ),
                     ],
@@ -88,7 +98,6 @@ TextEditingController _controller = TextEditingController();
             TextFormField(
               controller: _controller,
               decoration: InputDecoration(
-              
                 hintText: 'Write a caption...',
                 border: OutlineInputBorder(),
               ),
@@ -100,7 +109,7 @@ TextEditingController _controller = TextEditingController();
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      repost(post,_controller.text);
+                      repost(post, _controller.text);
                       // TODO: Handle post logic
                       Navigator.pop(context); // Close the dialog
                     },
