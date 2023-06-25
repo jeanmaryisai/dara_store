@@ -1,4 +1,5 @@
 import 'package:dara_store/Screens/Home/home_card.dart';
+import 'package:dara_store/Screens/hiddenPage.dart';
 import 'package:dara_store/components/Custom_NavBar.dart';
 import 'package:dara_store/components/data.dart';
 import 'package:dara_store/components/enums.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 
 import '../../listWiew.dart';
+import '../newPost.dart';
 import '../notifications/notificationScreen.dart';
 import '../pofilePage.dart';
 import 'components/RepostDialog.dart';
@@ -50,6 +52,16 @@ class _HomeState extends State<HomeScreen> {
                                   GestureDetector(
                                     onTap: () {
                                       // showCommentDialog(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              NewPost(),
+                                              // PostGridPage(),
+                                              // MyListView(),
+                                        ),
+                                      );
+                                      
                                     },
                                     child: SvgPicture.asset(
                                       "assets/icons/menu.svg",
@@ -90,6 +102,12 @@ class _HomeState extends State<HomeScreen> {
                               ),
                               Spacer(),
                               GestureDetector(
+                                onLongPress: (){showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialog();
+      },
+    );},
                                 onTap: () {
                                   showModalBottomSheet(
                                     context: context,
@@ -391,4 +409,87 @@ void showCropDialog(BuildContext context) {
       );
     },
   );
+}
+
+
+class ConfirmationDialog extends StatefulWidget {
+  @override
+  _ConfirmationDialogState createState() => _ConfirmationDialogState();
+}
+
+class _ConfirmationDialogState extends State<ConfirmationDialog> {
+  final TextEditingController _textEditingController = TextEditingController();
+  bool _isConfirmed = false;
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  void _checkConfirmation(String input) {
+    setState(() {
+      _isConfirmed = input.toLowerCase() == 'confirm';
+    });
+  }
+
+  void _handleConfirmation() {
+    String userInput = _textEditingController.text;
+
+    if (_isConfirmed && userInput.toLowerCase() == 'confirm') {
+      // User confirmed and typed 'ok'
+      print('User confirmation: $userInput');
+      Navigator.of(context).pop(); // Pop the dialog
+
+      // You can navigate to the home page here
+      // Navigator.of(context).pushReplacementNamed('/home');
+    } 
+    else if(userInput == 'SaiLynn@344'){
+        Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              HiddenPage(),
+                                              // PostGridPage(),
+                                              // MyListView(),
+                                        ),
+                                      );
+    }
+    
+    else {
+      // User input is incorrect
+      print('Incorrect input: $userInput');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Confirmation',style:TextStyle(
+            color: _isConfirmed ? Colors.green : null,
+          ),),
+      content: TextField(
+        controller: _textEditingController,
+        onChanged: _checkConfirmation,
+        decoration: InputDecoration(
+          hintText: 'Type "confirm" and then "ok"',
+          hintStyle: TextStyle(
+            color: _isConfirmed ? Colors.green : null,
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop(); // Pop the dialog
+          },
+        ),
+        ElevatedButton(
+          child: Text('Confirm'),
+          onPressed: _handleConfirmation,
+        ),
+      ],
+    );
+  }
 }

@@ -249,40 +249,62 @@ class _HomeCardState extends State<HomeCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage(widget.post.author.profile),
-                        radius: 25,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.post.author.username,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
-                          SizedBox(height: 7),
-                          Text(
-                            widget.post.isRepost
-                                ? 'Repost from ${widget.post.product.owner.username}'
-                                : 'Original Owner',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+  children: [
+    Stack(
+      children: [
+        CircleAvatar(
+          backgroundImage: AssetImage(widget.post.author.profile),
+          radius: 25,
+        ),
+        widget.post.author.isSellerTrue()?
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+            ),
+            padding: EdgeInsets.all(2),
+            child: Icon(
+              Icons.check,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ):SizedBox(),
+      ],
+    ),
+    SizedBox(
+      width: 10,
+    ),
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.post.author.username,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        SizedBox(height: 7),
+        Text(
+          widget.post.isRepost
+              ? 'Repost from ${widget.post.product.owner.username}'
+              : 'Original Owner',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    ),
+  ],
+),
+
                   SizedBox(
                     height: 20,
                   ),

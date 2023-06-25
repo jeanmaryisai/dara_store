@@ -5,6 +5,7 @@ import 'components/data.dart';
 import 'models/Product.dart';
 import 'models/chat.dart';
 import 'models/comment.dart';
+import 'models/followers.dart';
 import 'models/message.dart';
 import 'models/post.dart';
 import 'models/trade.dart';
@@ -42,10 +43,12 @@ Map<String, bool> getFollowerInfo(User me, User you) {
     if (element.first.id == me.id && element.followedBack.id == you.id) {
       map['iFollow'] = true;
       element.isFollowBack ? map['youFollow'] = true : map['youFollow'] = false;
+      print(12);
     }
     if (element.first.id == you.id && element.followedBack.id == me.id) {
       map['youFollow'] = true;
       element.isFollowBack ? map['iFollow'] = true : map['iFollow'] = false;
+      print(13);
     }
   });
   return map;
@@ -86,9 +89,11 @@ List<User> getFollowing(User user) {
 }
 
 void confirmTrade(Trade trade, bool accept) {
-
-    trades.firstWhere((element) => element.id == trade.id).isAccepted=accept;
-    Fluttertoast.showToast(msg:accept? 'The trade has been accepted':'The trade has been decline');
+  trades.firstWhere((element) => element.id == trade.id).isAccepted = accept;
+  Fluttertoast.showToast(
+      msg: accept
+          ? 'The trade has been accepted'
+          : 'The trade has been decline');
 }
 
 String generateUniqueId() {
@@ -97,11 +102,98 @@ String generateUniqueId() {
 }
 
 bool isTradeUnactive(Trade trade) {
+  bool cc(bool? x) {
+    return x ?? false;
+  }
+
   return trade.isAccepted != null ||
       trade.product.isSold ||
-      !trade.product.isAvailable;
+      !trade.product.isAvailable ||
+      trades.any((element) =>
+          element.product.id == trade.product.id && cc(element.isAccepted));
 }
 
 void updateChat(Chat chat, Message message) {
   chats.firstWhere((element) => element.id == chat.id).messages.add(message);
+}
+
+void unFollow(User me, User you) {
+  for (var element in followersGenerale) {
+    if (element.first.id == me.id &&
+        element.followedBack.id == you.id &&
+        element.isFollowBack) {
+      followersGenerale
+          .add(Followers(first: you, followedBack: me, isFollowBack: false));
+      followersGenerale.remove(element);
+      break;
+    }
+    if (element.first.id == me.id &&
+        element.followedBack.id == you.id &&
+        !element.isFollowBack) {
+      followersGenerale.remove(element);
+      break;
+    }
+    if (element.first.id == you.id &&
+        element.followedBack.id == me.id &&
+        element.isFollowBack) {
+      element.isFollowBack = false;
+      break;
+    }
+  }
+}
+
+void follow(User me, User you) {
+  bool b = false;
+  print(getFollowerInfo(me, you));
+  // if (!(followersGenerale.any((element) =>
+  //     element.first.id == me.id && element.followedBack.id == you.id))) {
+  //   print(1);
+  for (var element in followersGenerale) {
+    if (element.first.id == you.id &&
+        element.followedBack.id == me.id &&
+        !element.isFollowBack) {
+      element.isFollowBack = true;
+      b = true;
+      print(2);
+      break;
+    }
+  }
+  !b
+      ? followersGenerale
+          .add(Followers(first: me, followedBack: you, isFollowBack: false))
+      : null;
+  print(3);
+  print(getFollowerInfo(me, you));
+  // }
+  if (!(followersGenerale.any((element) =>
+      element.first.id == you.id && element.followedBack.id == me.id))) {}
+}
+
+List<User> searchUsers(List<User> _users, String query) {
+  if (query.isEmpty) {
+    // If the search query is empty, return the original list
+    return _users;
+  }
+
+  query = query.toLowerCase();
+
+  return _users.where((user) {
+    // Convert all user properties to lowercase for case-insensitive search
+    String username = user.username.toLowerCase();
+    // String name = user.name.toLowerCase();
+    String bio = user.bio.toLowerCase();
+    // String lastName = user.lastName.toLowerCase();
+
+    // Check if any of the user properties contain the search query
+    return username.contains(query) ||
+        // name.contains(query) ||
+        bio.contains(query) ||
+        // lastName.contains(query) ||
+        username.split(' ').any((part) => part.startsWith(query)) ||
+        bio.split(' ').any((word) => word.startsWith(query));
+  }).toList();
+}
+
+void changeSellerState(User user, bool bol) {
+  users.firstWhere((element) => user.id == element.id).isSeller = bol;
 }

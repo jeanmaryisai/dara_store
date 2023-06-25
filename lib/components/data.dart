@@ -219,7 +219,7 @@ List<Trade> trades = List.generate(
         amout: random.nextDouble() * 100000,
         sender: index % 2 == 0 ? currentUser : users[3],
         receiver: index % 2 == 1 ? currentUser : users[3],
-        isAccepted: false,
+        isAccepted: null,
         product: products[index],
         created: DateTime.now(),
         buyer: users[3]));
@@ -258,6 +258,21 @@ List<Comment> comments=List.generate(
 
 User currentUser = users[0];
 
-// enum quotaValue={
-//   Likeposts=10,
-// }
+enum quota {
+  Like,
+  Followed,
+  Comment,
+}
+
+extension quotaValue on quota {
+  int get value {
+    switch (this) {
+      case quota.Like:
+        return 40;
+      case quota.Followed:
+        return 330;
+      case quota.Comment:
+        return 300;
+    }
+  }
+}

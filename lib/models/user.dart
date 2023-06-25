@@ -7,10 +7,14 @@ class User extends Identifiable {
   String password;
   String bio;
   String profile;
+  bool? isSeller;
   User(
-      {
-      required this.username,
+      {required this.username,
       required this.password,
       required this.profile,
+      isSeller = false,
       this.bio = "Hello I am user Mirv_store"});
+  bool isSellerTrue() {
+    return isSeller ?? false;
+  }
 }

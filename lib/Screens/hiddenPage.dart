@@ -7,21 +7,23 @@ import 'package:flutter_svg/svg.dart';
 import '../../models/user.dart';
 import '../../utils.dart';
 
-class Discover extends StatefulWidget {
-  static String routeName = "/discover";
+class HiddenPage extends StatefulWidget {
+  static String routeName = "/HiddenPage";
   @override
-  _DiscoverState createState() => _DiscoverState();
+  _HiddenPageState createState() => _HiddenPageState();
 }
 
-class _DiscoverState extends State<Discover> {
+class _HiddenPageState extends State<HiddenPage> {
   @override
-  List<User> _users=users;
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
   Widget build(BuildContext context) {
+    List<User> _users = users
+        .where(
+            (element) => element.isSeller == null || element.isSeller == true)
+        .toList();
+    List<User> _users2 = users
+        .where(
+            (element) => element.isSeller == null || element.isSeller == true)
+        .toList();
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -29,7 +31,7 @@ class _DiscoverState extends State<Discover> {
             Padding(
               padding: const EdgeInsets.all(10),
               child: SearchBar(onChanged: (query) {
-                _users=searchUsers(users,query);
+                searchUsers(_users2, query);
                 setState(() {
                   
                 });
@@ -74,7 +76,7 @@ class _DiscoverState extends State<Discover> {
                       contentPadding: EdgeInsets.all(0),
                       title: Text(friend.username),
                       subtitle: Text(friend.bio),
-                      trailing: getFollowerInfo(currentUser, friend)['iFollow']!
+                      trailing: friend.isSellerTrue()
                           ? Container(
                               width: 100.0,
                               height: 38.0,
@@ -105,7 +107,7 @@ class _DiscoverState extends State<Discover> {
                               ),
                               child: TextButton(
                                 child: Text(
-                                  'UnFollow',
+                                  'RemoveSeller',
                                   style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.w600,
@@ -126,7 +128,7 @@ class _DiscoverState extends State<Discover> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  unFollow(currentUser, friend);
+                                  changeSellerState(friend, false);
                                   setState(() {});
                                 },
                               ),
@@ -145,75 +147,79 @@ class _DiscoverState extends State<Discover> {
                               //   onPressed: () {},
                               // ),
                             )
-                          : Container(
-                              width: 100.0,
-                              height: 38.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff651CE5).withOpacity(0.3),
-                                    spreadRadius: 1,
-                                    blurRadius: 8,
-                                    offset: Offset(
-                                        0, 5), // changes position of shadow
-                                  ),
-                                ],
-                                gradient: LinearGradient(
-                                  // Where the linear gradient begins and ends
-                                  begin: Alignment.topRight,
-                                  end: Alignment.bottomLeft,
-                                  // Add one stop for each color. Stops should increase from 0 to 1
-                                  stops: [0.1, 0.9],
-                                  colors: [
-                                    // Colors are easy thanks to Flutter's Colors class.
-                                    Color(0xff651CE5),
-                                    Color(0xff811ce5),
-                                  ],
-                                ),
-                              ),
-                              child: TextButton(
-                                child: Text(
-                                  'Follow',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                style: ButtonStyle(
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.white),
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.transparent),
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
+                          : friend.isSeller == null
+                              ? Container(
+                                  width: 100.0,
+                                  height: 38.0,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xff651CE5).withOpacity(0.3),
+                                        spreadRadius: 1,
+                                        blurRadius: 8,
+                                        offset: Offset(
+                                            0, 5), // changes position of shadow
+                                      ),
+                                    ],
+                                    gradient: LinearGradient(
+                                      // Where the linear gradient begins and ends
+                                      begin: Alignment.topRight,
+                                      end: Alignment.bottomLeft,
+                                      // Add one stop for each color. Stops should increase from 0 to 1
+                                      stops: [0.1, 0.9],
+                                      colors: [
+                                        // Colors are easy thanks to Flutter's Colors class.
+                                        Color(0xff651CE5),
+                                        Color(0xff811ce5),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                onPressed: () {
-                                  follow(currentUser, friend);
-                                  setState(() {});
-                                },
-                              ),
-                              // FlatButton(
-                              //   child: Text(
-                              //     'Follow',
-                              //     style: TextStyle(
-                              //       fontSize: 16.0,
-                              //       fontWeight: FontWeight.w600,
-                              //     ),
-                              //   ),
-                              //   textColor: Colors.white,
-                              //   color: Colors.transparent,
-                              //   shape: RoundedRectangleBorder(
-                              //       borderRadius: BorderRadius.circular(30.0)),
-                              //   onPressed: () {},
-                              // ),
-                            ),
+                                  child: TextButton(
+                                    child: Text(
+                                      'Promote to seller',
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.white),
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.transparent),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      follow(currentUser, friend);
+                                      setState(() {});
+                                    },
+                                  ),
+                                  // FlatButton(
+                                  //   child: Text(
+                                  //     'Follow',
+                                  //     style: TextStyle(
+                                  //       fontSize: 16.0,
+                                  //       fontWeight: FontWeight.w600,
+                                  //     ),
+                                  //   ),
+                                  //   textColor: Colors.white,
+                                  //   color: Colors.transparent,
+                                  //   shape: RoundedRectangleBorder(
+                                  //       borderRadius: BorderRadius.circular(30.0)),
+                                  //   onPressed: () {},
+                                  // ),
+                                )
+                              : SizedBox(),
                       onTap: () {},
                     ),
                   );
@@ -267,7 +273,10 @@ class SearchBar extends StatelessWidget {
           ),
           hintText: 'Search...',
           border: InputBorder.none,
-         
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.blue),
+          ),
         ),
       ),
     );
