@@ -118,7 +118,8 @@ List<Product> products = List.generate(
         title: titles[index],
         description: descriptions[index],
         image: "assets/images/dm${random.nextInt(4)}.jpg",
-        owner: users[random.nextInt(10)],
+        // owner: users[random.nextInt(10)],
+        owner: currentUser,
         staticPrice: getdouble(index)));
 
 List<NotificationCustom> notifs = [
@@ -191,6 +192,7 @@ List<Post> posts = List.generate(
           caption: messages[random.nextInt(10)],
           product: products[random.nextInt(18)],
           isRepost: random.nextBool(),
+          liked:List.generate(6, (index) => users[random.nextInt(10)])
         ));
 List<Message> messagesGenerales = List.generate(
     10,

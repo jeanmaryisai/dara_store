@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../models/user.dart';
 import '../../utils.dart';
+import 'profile/ProfileScreen.dart';
 
 class HiddenPage extends StatefulWidget {
   static String routeName = "/HiddenPage";
@@ -14,9 +15,7 @@ class HiddenPage extends StatefulWidget {
 }
 
 class _HiddenPageState extends State<HiddenPage> {
-  @override
-  Widget build(BuildContext context) {
-    List<User> _users = users
+      List<User> _users = users
         .where(
             (element) => element.isSeller == null || element.isSeller == true)
         .toList();
@@ -24,6 +23,9 @@ class _HiddenPageState extends State<HiddenPage> {
         .where(
             (element) => element.isSeller == null || element.isSeller == true)
         .toList();
+  @override
+  Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -31,10 +33,9 @@ class _HiddenPageState extends State<HiddenPage> {
             Padding(
               padding: const EdgeInsets.all(10),
               child: SearchBar(onChanged: (query) {
-                searchUsers(_users2, query);
+                print(query);
                 setState(() {
-                  
-                });
+                _users = searchUsers(_users2, query);});
               }),
             ),
             Padding(
@@ -200,7 +201,7 @@ class _HiddenPageState extends State<HiddenPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      follow(currentUser, friend);
+                                      changeSellerState(friend, true);
                                       setState(() {});
                                     },
                                   ),
@@ -220,7 +221,15 @@ class _HiddenPageState extends State<HiddenPage> {
                                   // ),
                                 )
                               : SizedBox(),
-                      onTap: () {},
+                      onTap: () { Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProfileScreen(user: friend),
+                                          // PostGridPage(),
+                                          // MyListView(),
+                                        ),
+                                      );},
                     ),
                   );
                 },
@@ -273,10 +282,6 @@ class SearchBar extends StatelessWidget {
           ),
           hintText: 'Search...',
           border: InputBorder.none,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.blue),
-          ),
         ),
       ),
     );

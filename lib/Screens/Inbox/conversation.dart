@@ -122,7 +122,7 @@ class _ConversationState extends State<Conversation> {
                   reverse: true,
                   itemBuilder: (BuildContext context, int index) {
                     Message msg = widget.chat.getMessagesOrderedByMostRecent()[index];
-                    return ChatBubble(msg: msg);
+                    return ChatBubble(msg: msg,refresh:()=>setState((){}));
                   },
                 ),
               ),

@@ -8,10 +8,12 @@ class Post extends Identifiable {
   String caption;
   User author;
   bool isRepost;
+  List<User> liked;
   Post({
     required this.product,
     required this.caption,
     required this.author,
     required this.isRepost,
+    required this.liked,
   });
 }

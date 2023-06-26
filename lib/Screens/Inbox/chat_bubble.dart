@@ -10,8 +10,10 @@ import '../Home/HomeScreen.dart';
 
 class ChatBubble extends StatefulWidget {
   final Message msg;
+  final VoidCallback refresh;
+  final Chat chat;
 
-  const ChatBubble({super.key, required this.msg});
+  const ChatBubble({super.key, required this.msg, required this.refresh,required this.chat});
 
   @override
   _ChatBubbleState createState() => _ChatBubbleState();
@@ -169,7 +171,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                                 //  widget.type == "text"
                                 // ? !widget.isReply!?
                                 Text(
-                              widget.msg.message ?? '',
+                              widget.msg.message,
                               style: TextStyle(
                                 color: widget.msg.isMe()
                                     ? Colors.white
@@ -228,7 +230,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 onDecline: () {},
                 time: widget.msg.timeAgo(),
                 isMe: widget.msg.isMe(),
-              ),
+                refresh: widget.refresh),
       ],
     );
   }
@@ -242,6 +244,7 @@ class PriceCard extends StatefulWidget {
   final Color? color;
   final bool? isMe;
   final String? time;
+  final VoidCallback refresh;
 
   PriceCard(
       {this.color,
@@ -250,7 +253,8 @@ class PriceCard extends StatefulWidget {
       required this.onDecline,
       required this.onNewPropose,
       this.isMe,
-      this.time});
+      this.time,
+      required this.refresh});
 
   @override
   State<PriceCard> createState() => _PriceCardState();
@@ -276,7 +280,7 @@ class _PriceCardState extends State<PriceCard> {
             maxWidth: MediaQuery.of(context).size.width / 1.3,
             minWidth: 20.0,
           ),
-          child: NegociationCard(trade: widget.trade),
+          child: NegociationCard(trade: widget.trade, refresh: widget.refresh),
         ),
         Padding(
           padding: widget.isMe!
@@ -485,8 +489,10 @@ class DisabledButton extends StatelessWidget {
 
 class NegociationCard extends StatefulWidget {
   final Trade trade;
+  final VoidCallback refresh;
 
-  const NegociationCard({super.key, required this.trade});
+  const NegociationCard(
+      {super.key, required this.trade, required this.refresh});
 
   @override
   _NegociationCardState createState() => _NegociationCardState();
@@ -510,7 +516,7 @@ class _NegociationCardState extends State<NegociationCard> {
           children: [
             Container(
               child: Text(
-                "Negociation",
+                "Negociation ${widget.trade.sender.username}",
                 style: TextStyle(
                   color: Theme.of(context).accentColor,
                   fontWeight: FontWeight.bold,
@@ -558,8 +564,8 @@ class _NegociationCardState extends State<NegociationCard> {
                                   ? 'I am not satisfied with the current proposed price, I am proposing a new one'
                                   : widget.trade.isAccepted!
                                       ? widget.trade.buyer.id == currentUser.id
-                                          ? 'this post has been aggreed on both side please proceed to the checking and confirmation phase'
-                                          : 'this post has been aggreed on both side waiting for the checking and confirmation phase'
+                                          ? 'this trade has been aggreed on both side please proceed to the checking and confirmation phase'
+                                          : 'this trade has been aggreed on both side waiting for the checking and confirmation phase'
                                       : 'This trade has been declined'
                               : 'The product has benn Sold'
                           : 'This product is currently unavailable',
@@ -587,60 +593,33 @@ class _NegociationCardState extends State<NegociationCard> {
               maxLines: 1,
             ),
             SizedBox(height: 16),
-            widget.trade.sender.id==currentUser.id?
-            Text(
-              // 'Price: \$${widget.pr.toStringAsFixed(2)}',
-              'Trade sent',
-              style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-              maxLines: 1,
-            ):
-            cc &&
-                    !widget.trade.product.isSold &&
-                    widget.trade.product.isAvailable
-                ? ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+            widget.trade.sender.id == currentUser.id
+                ? Text(
+                    // 'Price: \$${widget.pr.toStringAsFixed(2)}',
+                    'Trade sent',
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                    child: Text(
-                      'Proceed to check',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    maxLines: 1,
                   )
-                : Column(children: [
-                    isTradeUnactive(widget.trade)
-                        ? DisabledButton(
-                            buttonText: 'Accept',
+                : cc &&
+                        !widget.trade.product.isSold &&
+                        widget.trade.product.isAvailable
+                    ? widget.trade.product.owner.id == currentUser.id
+                        ? Text(
+                            // 'Price: \$${widget.pr.toStringAsFixed(2)}',
+                            'Waiting for check',
+                            style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
                           )
                         : ElevatedButton(
-                            onPressed: () {
-                              confirmTrade(widget.trade, true);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'Accept',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                    SizedBox(height: 8),
-                    isTradeUnactive(widget.trade)
-                        ? DisabledButton(
-                            buttonText: 'Decline',
-                          )
-                        : ElevatedButton(
-                            onPressed: () {confirmTrade(widget.trade, false);},
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
                               primary: Colors.red,
                               shape: RoundedRectangleBorder(
@@ -648,66 +627,112 @@ class _NegociationCardState extends State<NegociationCard> {
                               ),
                             ),
                             child: Text(
-                              'Decline',
+                              'Proceed to check',
                               style: TextStyle(fontSize: 16),
                             ),
-                          ),
-                    SizedBox(height: 16),
-                    isTradeUnactive(widget.trade)
-                        ? SizedBox()
-                        : Row(
-                            children: [
-                              Expanded(
-                                  child: TextField(
-                                keyboardType: TextInputType.number,
-                                onChanged: (value) {
-                                  _newPrice = double.tryParse(value) ??
-                                      widget.trade.amout;
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'New Price',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Colors.blue,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).accentColor,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                ),
-                              )),
-                              SizedBox(width: 16),
-                              ElevatedButton(
+                          )
+                    : Column(children: [
+                        isTradeUnactive(widget.trade)
+                            ? DisabledButton(
+                                buttonText: 'Accept',
+                              )
+                            : ElevatedButton(
                                 onPressed: () {
-                                  // widget.onNewPropose(newPrice);
-                                  // showCommentDialog(context);
+                                  confirmTrade(widget.trade, true);
+                                  widget.refresh;
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).accentColor,
-                                  padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                                  primary: Colors.green,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: Icon(Icons.send),
+                                child: Text(
+                                  'Accept',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ),
-                            ],
-                          ),
-                  ]),
+                        SizedBox(height: 8),
+                        isTradeUnactive(widget.trade)
+                            ? DisabledButton(
+                                buttonText: 'Decline',
+                              )
+                            : ElevatedButton(
+                                onPressed: () {
+                                  confirmTrade(widget.trade, false);
+                                  widget.refresh;
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Decline',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                        SizedBox(height: 16),
+                        isTradeUnactive(widget.trade)
+                            ? SizedBox()
+                            : Row(
+                                children: [
+                                  Expanded(
+                                      child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      _newPrice = double.tryParse(value) ??
+                                          widget.trade.amout;
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'New Price',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.blue,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Theme.of(context).accentColor,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                                  SizedBox(width: 16),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      newTrade(
+                                        _newPrice,widget.chat,trade,
+                                      );
+                                      // widget.onNewPropose(newPrice);
+                                      // showCommentDialog(context);
+                                      widget.refresh;
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).accentColor,
+                                      padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Icon(Icons.send),
+                                  ),
+                                ],
+                              ),
+                      ]),
           ],
         ),
       ),

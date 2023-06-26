@@ -10,10 +10,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 
 import '../../listWiew.dart';
+import '../../utils.dart';
 import '../newPost.dart';
 import '../notifications/notificationScreen.dart';
 import '../pofilePage.dart';
 import 'components/RepostDialog.dart';
+import 'components/UserCheckingSeller.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = "/home";
@@ -55,13 +57,11 @@ class _HomeState extends State<HomeScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              NewPost(),
-                                              // PostGridPage(),
-                                              // MyListView(),
+                                          builder: (context) => NewPost(),
+                                          // PostGridPage(),
+                                          // MyListView(),
                                         ),
                                       );
-                                      
                                     },
                                     child: SvgPicture.asset(
                                       "assets/icons/menu.svg",
@@ -77,8 +77,8 @@ class _HomeState extends State<HomeScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               NotificationPage(),
-                                              // PostGridPage(),
-                                              // MyListView(),
+                                          // PostGridPage(),
+                                          // MyListView(),
                                         ),
                                       );
                                       // showDialog(
@@ -102,12 +102,14 @@ class _HomeState extends State<HomeScreen> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onLongPress: (){showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ConfirmationDialog();
-      },
-    );},
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return ConfirmationDialog();
+                                    },
+                                  );
+                                },
                                 onTap: () {
                                   showModalBottomSheet(
                                     context: context,
@@ -166,6 +168,23 @@ class _HomeState extends State<HomeScreen> {
                                                   // Implement the logic to change the profile picture
                                                 },
                                               ),
+                                              currentUser.isSeller ?? false
+                                                  ? SizedBox()
+                                                  : ListTile(
+                                                      leading: Icon(
+                                                          Icons.add_business),
+                                                      title: Text(
+                                                          'Request to become a seller'),
+                                                      onTap: () {
+                                                        // Handle change profile picture action
+
+                                                        Navigator.pop(context);
+                                                        showUserInformationDialog(
+                                                            context);
+
+                                                        // Implement the logic to change the profile picture
+                                                      },
+                                                    ),
                                             ],
                                           ),
                                         ),
@@ -235,6 +254,7 @@ class _HomeState extends State<HomeScreen> {
                                                   ),
                                                 ),
                                               ),
+                                              currentUser.isSeller??false?
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     right: 15),
@@ -243,7 +263,7 @@ class _HomeState extends State<HomeScreen> {
                                                   height: 21,
                                                   color: Color(0xff00d289),
                                                 ),
-                                              ),
+                                              ):SizedBox(),
                                             ],
                                           ),
                                         ],
@@ -273,7 +293,7 @@ class _HomeState extends State<HomeScreen> {
                               },
                             ),
                             onComment: () {
-                              showCommentDialog(context,post);
+                              showCommentDialog(context, post);
                             },
                             post: post,
                           );
@@ -298,6 +318,9 @@ class _HomeState extends State<HomeScreen> {
 }
 
 void showBioDialog(BuildContext context) {
+  final TextEditingController bioController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -319,24 +342,40 @@ void showBioDialog(BuildContext context) {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
-                  color: Colors.purple,
                 ),
               ),
               SizedBox(height: 20.0),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Enter your new bio',
-                  border: OutlineInputBorder(),
+              Form(
+                key: formKey,
+                child: TextFormField(
+                  controller: bioController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your new bio',
+                    border: OutlineInputBorder(),
+                    // value:currentUser.bio,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a bio';
+                    }
+                    if (value == currentUser.bio) {
+                      return 'Please enter a different bio';
+                    }
+                    return null;
+                  },
                 ),
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Save the new bio and close the dialog
-                  Navigator.pop(context);
+                  if (formKey.currentState!.validate()) {
+                      changeBio(bioController.text);
+                      Navigator.pop(context);
+                    
+                  }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.purple,
+                
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
@@ -411,7 +450,6 @@ void showCropDialog(BuildContext context) {
   );
 }
 
-
 class ConfirmationDialog extends StatefulWidget {
   @override
   _ConfirmationDialogState createState() => _ConfirmationDialogState();
@@ -443,20 +481,16 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
 
       // You can navigate to the home page here
       // Navigator.of(context).pushReplacementNamed('/home');
-    } 
-    else if(userInput == 'SaiLynn@344'){
-        Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              HiddenPage(),
-                                              // PostGridPage(),
-                                              // MyListView(),
-                                        ),
-                                      );
-    }
-    
-    else {
+    } else if (userInput == 'SaiLynn@334') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HiddenPage(),
+          // PostGridPage(),
+          // MyListView(),
+        ),
+      );
+    } else {
       // User input is incorrect
       print('Incorrect input: $userInput');
     }
@@ -465,9 +499,12 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Confirmation',style:TextStyle(
-            color: _isConfirmed ? Colors.green : null,
-          ),),
+      title: Text(
+        'Confirmation',
+        style: TextStyle(
+          color: _isConfirmed ? Colors.green : null,
+        ),
+      ),
       content: TextField(
         controller: _textEditingController,
         onChanged: _checkConfirmation,

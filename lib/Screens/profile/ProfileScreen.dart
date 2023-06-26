@@ -1,13 +1,26 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
-import 'package:dara_store/components/Custom_NavBar.dart';
-import 'package:dara_store/components/enums.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:ui';
+
+import 'package:dara_store/components/Custom_NavBar.dart';
+import 'package:dara_store/components/enums.dart';
+import 'package:intl/intl.dart';
+
+import '../../components/data.dart';
+import '../../models/post.dart';
+import '../../models/user.dart';
+import '../../utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   static String routeName = "/profile";
-  const ProfileScreen({Key? key}) : super(key: key);
+  final User user;
+  const ProfileScreen({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -15,6 +28,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   static Random random = Random();
+  NumberFormat numberFormat = NumberFormat.compact();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,22 +48,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SvgPicture.asset(
-                            "assets/icons/back-arrow.svg",
-                            color: Colors.black,
-                            height: 25,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: SvgPicture.asset(
+                              "assets/icons/back-arrow.svg",
+                              color: Colors.black,
+                              height: 25,
+                            ),
                           ),
                           Text(
-                            "John doy",
+                            widget.user.username,
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w700,
                               fontSize: 25,
                             ),
-                          ),
-                          SvgPicture.asset(
-                            "assets/icons/dots.svg",
-                            height: 8,
                           ),
                         ],
                       ),
@@ -77,11 +92,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 200,
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/images/avtar.jpg'),
-                          radius: 25,
-                        ),
+                        child: 
+                        // Stack(
+                          // children: [
+                            CircleAvatar(
+                              backgroundImage: AssetImage(widget.user.profile),
+                              radius: 25,
+                            ),
+                        //     widget.user.isSellerTrue()
+                        //         ? Positioned(
+                        //             bottom: 0,
+                        //             right: 0,
+                        //             child: Container(
+                        //               decoration: BoxDecoration(
+                        //                 color: Colors.blue,
+                        //                 shape: BoxShape.circle,
+                        //               ),
+                        //               padding: EdgeInsets.all(2),
+                        //               child: Icon(
+                        //                 Icons.check,
+                        //                 color: Colors.white,
+                        //                 size: 20,
+                        //               ),
+                        //             ),
+                        //           )
+                        //         : SizedBox(),
+                        //   ],
+                        // ),
                       ),
                     ),
                   ),
@@ -89,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     height: 30,
                   ),
                   Text(
-                    "@John_doy",
+                    widget.user.isSeller??false?"This user is a seller ":"This user is a regular user.",
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
@@ -110,7 +147,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Container(
                               child: Text(
-                                "29",
+                                numberFormat
+                                    .format(getFollowing(widget.user).length),
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -136,7 +174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Container(
                               child: Text(
-                                "140k",
+                                numberFormat
+                                    .format(getFollowers(widget.user).length),
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -162,7 +201,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Container(
                               child: Text(
-                                "5M",
+                                numberFormat
+                                    .format(getLikeCountUser(widget.user)),
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -190,131 +230,183 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100.0,
-                        height: 43.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xff651CE5).withOpacity(0.3),
-                              spreadRadius: 1,
-                              blurRadius: 8,
-                              offset:
-                                  Offset(0, 5), // changes position of shadow
+                  currentUser.id == widget.user.id
+                      ? SizedBox()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             getFollowerInfo(currentUser, widget.user)['iFollow']!
+                          ? Container(
+                              width: 100.0,
+                              height: 38.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff651CE5).withOpacity(0.3),
+                                    spreadRadius: 1,
+                                    blurRadius: 8,
+                                    offset: Offset(
+                                        0, 5), // changes position of shadow
+                                  ),
+                                ],
+                                gradient: LinearGradient(
+                                  // Where the linear gradient begins and ends
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                  // Add one stop for each color. Stops should increase from 0 to 1
+                                  stops: [0.1, 0.9],
+                                  colors: [
+                                    // Colors are easy thanks to Flutter's Colors class.
+
+                                    Colors.black.withOpacity(0.5),
+                                    Colors.grey,
+                                  ],
+                                ),
+                              ),
+                              child: TextButton(
+                                child: Text(
+                                  'UnFollow',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.transparent),
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  unFollow(currentUser, widget.user);
+                                  setState(() {});
+                                },
+                              ),
+                              // FlatButton(
+                              //   child: Text(
+                              //     'Unfollow',
+                              //     style: TextStyle(
+                              //       fontSize: 16.0,
+                              //       fontWeight: FontWeight.w600,
+                              //     ),
+                              //   ),
+                              //   textColor: Colors.white,
+                              //   color: Colors.transparent,
+                              //   shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(30.0)),
+                              //   onPressed: () {},
+                              // ),
+                            )
+                          : Container(
+                              width: 100.0,
+                              height: 38.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff651CE5).withOpacity(0.3),
+                                    spreadRadius: 1,
+                                    blurRadius: 8,
+                                    offset: Offset(
+                                        0, 5), // changes position of shadow
+                                  ),
+                                ],
+                                gradient: LinearGradient(
+                                  // Where the linear gradient begins and ends
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                  // Add one stop for each color. Stops should increase from 0 to 1
+                                  stops: [0.1, 0.9],
+                                  colors: [
+                                    // Colors are easy thanks to Flutter's Colors class.
+                                    Color(0xff651CE5),
+                                    Color(0xff811ce5),
+                                  ],
+                                ),
+                              ),
+                              child: TextButton(
+                                child: Text(
+                                  'Follow',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.transparent),
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  follow(currentUser, widget.user);
+                                  setState(() {});
+                                },
+                              ),
+                              // FlatButton(
+                              //   child: Text(
+                              //     'Follow',
+                              //     style: TextStyle(
+                              //       fontSize: 16.0,
+                              //       fontWeight: FontWeight.w600,
+                              //     ),
+                              //   ),
+                              //   textColor: Colors.white,
+                              //   color: Colors.transparent,
+                              //   shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(30.0)),
+                              //   onPressed: () {},
+                              // ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            GestureDetector(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  color: Colors.grey.withOpacity(0.2),
+                                ),
+                                height: 50,
+                                width: 50,
+                                child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/mail-outline.svg",
+                                    )),
+                              ),
+                              onTap: () {},
                             ),
                           ],
-                          gradient: LinearGradient(
-                            // Where the linear gradient begins and ends
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            // Add one stop for each color. Stops should increase from 0 to 1
-                            stops: [0.1, 0.9],
-                            colors: [
-                              // Colors are easy thanks to Flutter's Colors class.
-                              Color(0xff651CE5),
-                              Color(0xff811ce5),
-                            ],
-                          ),
                         ),
-                        child:
-                            // FlatButton(
-                            //   child: Text(
-                            //     'Follow',
-                            //     style: TextStyle(
-                            //       fontSize: 16.0,
-                            //       fontWeight: FontWeight.w600,
-                            //     ),
-                            //   ),
-                            //   textColor: Colors.white,
-                            //   color: Colors.transparent,
-                            //   shape: RoundedRectangleBorder(
-                            //       borderRadius: BorderRadius.circular(30.0)),
-                            //   onPressed: () {},
-                            // ),
-                            TextButton(
-                          child: Text(
-                            'Follow',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors.transparent),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                            ),
-                          ),
-                          onPressed: () {},
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            color: Colors.grey.withOpacity(0.2),
-                          ),
-                          height: 50,
-                          width: 50,
-                          child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SvgPicture.asset(
-                                "assets/icons/mail-outline.svg",
-                              )),
-                        ),
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
                   SizedBox(
                     height: 30,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Photos",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Videos",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Text(
-                          "Tagged",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SvgPicture.asset(
-                          "assets/icons/two dots.svg",
-                          height: 20,
-                        )
-                      ],
+                    child: Text(
+                      "Post",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -325,12 +417,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     physics: NeverScrollableScrollPhysics(),
                     primary: false,
                     padding: EdgeInsets.all(5),
-                    itemCount: 6,
+                    itemCount: getUserPosts(widget.user).length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 200 / 300,
                     ),
                     itemBuilder: (BuildContext context, int index) {
+                      Post post = getUserPosts(widget.user)[index];
                       return Padding(
                         padding: EdgeInsets.all(5.0),
                         child: Stack(
@@ -338,7 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(15.0),
                               child: Image.asset(
-                                "assets/images/px$index.jpg",
+                                post.product.image,
                                 fit: BoxFit.fill,
                               ),
                             ),
@@ -359,7 +452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "123k",
+                                          numberFormat.format(getLikeCount(post)),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18,
@@ -385,6 +478,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          widget.user.id==currentUser.id?
           Positioned.fill(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -392,7 +486,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 selectedMenu: MenuState.profile,
               ),
             ),
-          ),
+          ):SizedBox(),
         ]),
       ),
     ));

@@ -66,7 +66,7 @@ List<Comment> getCommentsByPost(Post post) {
   List<Comment> c =
       comments.where((element) => element.post.id == post.id).toList();
   c.sort(((a, b) => a.created.compareTo(b.created)));
-  return c.toList();
+  return c.reversed.toList();
 }
 
 void repost(Post post, String caption) {
@@ -74,7 +74,8 @@ void repost(Post post, String caption) {
       product: post.product,
       caption: caption,
       author: currentUser,
-      isRepost: true);
+      isRepost: true,
+      liked: List.generate(5, (index) => users[random.nextInt(10)]));
   posts.add(post2);
 
   Fluttertoast.showToast(msg: 'Reposted');
@@ -196,4 +197,62 @@ List<User> searchUsers(List<User> _users, String query) {
 
 void changeSellerState(User user, bool bol) {
   users.firstWhere((element) => user.id == element.id).isSeller = bol;
+}
+
+void changeBio(String bio) {
+  users.firstWhere((element) => element.id == currentUser.id).bio = bio;
+  Fluttertoast.showToast(msg: "Your bio has been changed");
+}
+
+int getLikeCount(Post post) {
+  return post.liked.length;
+}
+
+int getLikeCountUser(User user) {
+  int total = 0;
+  posts
+      .where((element) => element.author.id == currentUser.id)
+      .toList()
+      .forEach((element) {
+    total += getLikeCount(element);
+  });
+  return total;
+}
+
+bool isLike(Post post) {
+  return post.liked.any((element) => element.id == currentUser.id);
+}
+
+void like(Post post) {
+  !isLike(post)
+      ? posts
+          .firstWhere((element) => element.id == post.id)
+          .liked
+          .add(currentUser)
+      : posts
+          .firstWhere((element) => element.id == post.id)
+          .liked
+          .remove(currentUser);
+}
+
+List<Post> getUserPosts(User user) {
+  return posts.where((element) => element.author.id == user.id).toList();
+}
+
+void newTrade(double price, Chat chat, Trade trade) {
+  if (trade.amout == price) {
+    Fluttertoast.showToast(msg: "This trade already exist");
+  } else {
+    Trade newTrade = Trade(
+      amout: price,
+      sender: currentUser,
+      receiver: chat.theOrther(),
+      product: trade.product,
+      buyer: trade.buyer,
+      created: DateTime.now(),
+    );
+    chat.messages.add(
+        Message(send: DateTime.now(), sender: currentUser, trade: newTrade));
+    Fluttertoast.showToast(msg: "New Trade send");
+  }
 }

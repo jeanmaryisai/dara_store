@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../../models/post.dart';
+import '../../utils.dart';
 import 'HomeScreen.dart';
 
 class HomeCard extends StatefulWidget {
@@ -11,14 +13,20 @@ class HomeCard extends StatefulWidget {
   final VoidCallback onRepost;
   final VoidCallback onComment;
 
-  HomeCard({Key? key, required this.onRepost, required this.post, required this.onComment})
+  HomeCard(
+      {Key? key,
+      required this.onRepost,
+      required this.post,
+      required this.onComment})
       : super(key: key);
   @override
   _HomeCardState createState() => _HomeCardState();
 }
 
 class _HomeCardState extends State<HomeCard> {
-  bool isLiked = false;
+  // Example value for the number of likes
+  // bool isLiked = false; // Example value for the like status
+  NumberFormat numberFormat = NumberFormat.compact();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -83,25 +91,25 @@ class _HomeCardState extends State<HomeCard> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child:!widget.post.product.isSold? 
-                    widget.post.product.staticPrice != null
-                        ? Text(
-                            "\$ ${widget.post.product.staticPrice!.toStringAsFixed(2)}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: 20,
-                            ),
-                          )
+                    child: !widget.post.product.isSold
+                        ? widget.post.product.staticPrice != null
+                            ? Text(
+                                "\$ ${widget.post.product.staticPrice!.toStringAsFixed(2)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 20,
+                                ),
+                              )
+                            : Text(
+                                'Open Price',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(181, 120, 255, 163),
+                                  fontSize: 20,
+                                ),
+                              )
                         : Text(
-                            'Open Price',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(181, 120, 255, 163),
-                              fontSize: 20,
-                            ),
-                          )
-                          :Text(
                             'Sold',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -159,28 +167,40 @@ class _HomeCardState extends State<HomeCard> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                color: Colors.white.withOpacity(0.4),
+                          Column(
+                            children: [
+                              GestureDetector(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.white.withOpacity(0.4),
+                                  ),
+                                  height: 60,
+                                  width: 60,
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(17.0),
+                                      child: SvgPicture.asset(
+                                        isLike(widget.post)
+                                            ? "assets/icons/heart-shape-silhouette.svg"
+                                            : "assets/icons/heart-shape-outine.svg",
+                                        color: Color(0xffffffff),
+                                      )),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    like(widget.post);
+                                  });
+                                },
                               ),
-                              height: 60,
-                              width: 60,
-                              child: Padding(
-                                  padding: const EdgeInsets.all(17.0),
-                                  child: SvgPicture.asset(
-                                    isLiked
-                                        ? "assets/icons/heart-shape-silhouette.svg"
-                                        : "assets/icons/heart-shape-outine.svg",
-                                    color: Color(0xffffffff),
-                                  )),
-                            ),
-                            onTap: () {
-                              setState(() {
-                                isLiked = !isLiked;
-                              });
-                            },
+                              Text(
+                                numberFormat.format(getLikeCount(widget.post)),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                           GestureDetector(
                             onTap: widget.onComment,
@@ -218,22 +238,23 @@ class _HomeCardState extends State<HomeCard> {
                               ),
                             ),
                           ),
-                          widget.post.product.isSold?SizedBox():
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              color: Colors.white.withOpacity(0.4),
-                            ),
-                            height: 60,
-                            width: 60,
-                            child: Padding(
-                              padding: const EdgeInsets.all(17.0),
-                              child: SvgPicture.asset(
-                                "assets/icons/plane.svg",
-                                color: Color(0xffffffff),
-                              ),
-                            ),
-                          ),
+                          widget.post.product.isSold
+                              ? SizedBox()
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.white.withOpacity(0.4),
+                                  ),
+                                  height: 60,
+                                  width: 60,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(17.0),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/plane.svg",
+                                      color: Color(0xffffffff),
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
                     ))
@@ -249,62 +270,63 @@ class _HomeCardState extends State<HomeCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-  children: [
-    Stack(
-      children: [
-        CircleAvatar(
-          backgroundImage: AssetImage(widget.post.author.profile),
-          radius: 25,
-        ),
-        widget.post.author.isSellerTrue()?
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-            ),
-            padding: EdgeInsets.all(2),
-            child: Icon(
-              Icons.check,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-        ):SizedBox(),
-      ],
-    ),
-    SizedBox(
-      width: 10,
-    ),
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.post.author.username,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-        SizedBox(height: 7),
-        Text(
-          widget.post.isRepost
-              ? 'Repost from ${widget.post.product.owner.username}'
-              : 'Original Owner',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 10,
-          ),
-        ),
-      ],
-    ),
-  ],
-),
-
+                    children: [
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage:
+                                AssetImage(widget.post.author.profile),
+                            radius: 25,
+                          ),
+                          widget.post.author.isSellerTrue()
+                              ? Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: EdgeInsets.all(2),
+                                    child: Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.post.author.username,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                          ),
+                          SizedBox(height: 7),
+                          Text(
+                            widget.post.isRepost
+                                ? 'Repost from ${widget.post.product.owner.username}'
+                                : 'Original Owner',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   SizedBox(
                     height: 20,
                   ),
@@ -340,31 +362,3 @@ class _HomeCardState extends State<HomeCard> {
   }
 }
 
-class MyCustomClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(size.width * 0.64, size.height * 0.1);
-    path.cubicTo(size.width * 0.64, size.height * 0.1, size.width * 0.38,
-        size.height * 0.1, size.width * 0.38, size.height * 0.1);
-    path.cubicTo(size.width * 0.17, size.height * 0.1, 0, size.height * 0.14, 0,
-        size.height / 5);
-    path.cubicTo(
-        0, size.height / 5, 0, size.height * 0.8, 0, size.height * 0.8);
-    path.cubicTo(0, size.height * 0.86, size.width * 0.17, size.height * 0.9,
-        size.width * 0.38, size.height * 0.9);
-    path.cubicTo(size.width * 0.38, size.height * 0.9, size.width * 0.64,
-        size.height * 0.9, size.width * 0.64, size.height * 0.9);
-    path.cubicTo(size.width * 0.84, size.height * 0.9, size.width,
-        size.height * 0.95, size.width, size.height);
-    path.cubicTo(size.width, size.height, size.width, 0, size.width, 0);
-    path.cubicTo(size.width, size.height * 0.05, size.width * 0.84,
-        size.height * 0.1, size.width * 0.64, size.height * 0.1);
-    path.cubicTo(size.width * 0.64, size.height * 0.1, size.width * 0.64,
-        size.height * 0.1, size.width * 0.64, size.height * 0.1);
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}

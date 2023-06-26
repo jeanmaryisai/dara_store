@@ -121,7 +121,7 @@ class _NewPostState extends State<NewPost> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset(
-                            'assets/icons/add_photo.svg',
+                            'assets/icons/comment.svg',
                             width: 48,
                             height: 48,
                             color: Colors.grey,

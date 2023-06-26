@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../models/user.dart';
 import '../../utils.dart';
+import '../profile/ProfileScreen.dart';
 
 class Discover extends StatefulWidget {
   static String routeName = "/discover";
@@ -214,7 +215,18 @@ class _DiscoverState extends State<Discover> {
                               //   onPressed: () {},
                               // ),
                             ),
-                      onTap: () {},
+                      onTap: () {
+                         Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProfileScreen(user: friend),
+                                          // PostGridPage(),
+                                          // MyListView(),
+                                        ),
+                                      );
+                      
+                      },
                     ),
                   );
                 },
